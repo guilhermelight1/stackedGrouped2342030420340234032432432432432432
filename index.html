@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html meta-charset="utf-8">
+
+
+<script src = "http://d3js.org/d3.v3.js"></script>
+<script src = "nv.d3.js"></script>
+
+
+<link rel = "stylesheet" href = "nv.d3.css">
+
+
+<div id = "chart1">
+  <svg></svg>
+</div>
+
+<script>
+  //$(document).ready(function(){
+    d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRIP6sUD5vq6UK6fhkmpP44nyJcCUjU84g9JWvKq_wTTtoygoNxdhKcCBgXjjzAT5Vup9JulfOIyiMx/pub?gid=0&single=true&output=csv", function(data){
+      
+      //get each key of the data that is not date
+      //these will be our key in the key/value pair
+      //the values x and y will be month and the value
+      var dataToPlot = Object.keys(data[0]).filter(function(k){return k!="date"})
+        .map(function(k){
+          return {"key":k,"values":data.map(function(d){
+           return {
+             //let's make this a real date
+             "x":d3.time.format("%Y-%b-%d").parse("2014-" + d.date + "-01"),
+             "y":+d[k]
+           }
+          })}
+        })
+        
+      nv.addGraph(function() {
+        var chart = nv.models.multiBarChart()
+		
+          .transitionDuration(350)
+          .reduceXTicks(true)   //If 'false', every single x-axis tick label will be rendered.
+          .rotateLabels(0)      //Angle to rotate x-axis labels.
+          .showControls(true)   //Allow user to switch between 'Grouped' and 'Stacked' mode.
+          .groupSpacing(0.1)    //Distance between each group of bars.
+        ;
+		
+    
+        chart.xAxis
+            .tickFormat(d3.time.format('%b'));
+    
+        chart.yAxis
+            .tickFormat(d3.format(',.1f'));
+    
+        d3.select('#chart1 svg')
+            .datum(dataToPlot)
+            .call(chart);
+    
+        nv.utils.windowResize(chart.update);
+    
+        return chart;
+      });
+    
+    })
+  //})
+
+  
+</script>
+
+</html>
